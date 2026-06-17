@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- CSS लिंक करो -->
-<link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>i-CID | Photo Ka Kachcha Chittha</title>
-    <!-- Tailwind CSS for styling -->
+    
+    <!-- CSS Link (For terminal flicker effect) -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Google Fonts for Hacker/Terminal Look -->
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -23,157 +27,195 @@
     </script>
 
     <style>
+        /* Modern Cyberpunk Blue-Green Theme */
+        :root {
+            --cyber-cyan: #00f0ff;
+            --cyber-green: #08f26e;
+            --cyber-dark: #020b0e;
+        }
+        
         body {
-            background-color: #050505;
-            color: #00ff41; /* Hacker Green */
+            background-color: var(--cyber-dark);
+            color: var(--cyber-cyan);
             font-family: 'Fira Code', monospace;
-            background-image: radial-gradient(circle, #001100 10%, #050505 80%);
+            background-image: radial-gradient(circle at top, #04212b 0%, var(--cyber-dark) 70%);
+            min-height: 100vh;
         }
-        .terminal-border {
-            border: 1px solid #00ff41;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+
+        .cyber-border {
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            background: rgba(4, 33, 43, 0.4);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
         }
+
+        .cyber-border:hover {
+            border-color: var(--cyber-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
         .glow-text {
-            text-shadow: 0 0 5px #00ff41;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+            background: -webkit-linear-gradient(45deg, var(--cyber-cyan), var(--cyber-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        /* Scanner Line Animation for Drop Zone */
+
+        /* Scan Line for Drop Zone */
         .scan-line {
             width: 100%;
             height: 2px;
-            background-color: #00ff41;
+            background-color: var(--cyber-cyan);
             position: absolute;
             top: 0;
             left: 0;
-            box-shadow: 0 0 10px #00ff41;
+            box-shadow: 0 0 15px 2px var(--cyber-cyan);
             animation: scan 2s infinite linear;
             display: none;
+            z-index: 20;
         }
+
         @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
         }
+
         /* Typewriter Cursor */
         .cursor {
             display: inline-block;
             width: 8px;
             height: 15px;
-            background-color: #00ff41;
+            background-color: var(--cyber-cyan);
             animation: blink 1s step-end infinite;
         }
+
         @keyframes blink { 50% { opacity: 0; } }
+
+        /* Custom Drop Zone Styling */
+        #dropZone {
+            border: 2px dashed rgba(0, 240, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        #dropZone:hover {
+            border-color: var(--cyber-green);
+            background: rgba(0, 240, 255, 0.05);
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+<body class="p-4 md:p-8 flex flex-col items-center">
 
     <!-- Header Section -->
-    <header class="text-center mb-8 w-full max-w-3xl">
-        <h1 class="text-4xl md:text-5xl font-bold tracking-widest glow-text mb-2 font-['Share_Tech_Mono']">
-            <i class="fa-solid fa-user-secret"></i> i-CID
+    <header class="text-center mb-8 w-full max-w-3xl mt-4">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-widest font-['Share_Tech_Mono'] mb-2">
+            <i class="fa-solid fa-user-secret text-cyan-400"></i> <span class="glow-text">i-CID</span>
         </h1>
-        <p class="text-sm md:text-base text-green-600">
+        <p class="text-xs md:text-sm text-cyan-600/80 font-semibold tracking-wider">
             [SYSTEM DETECTED] // अपनी फोटो डालो, अपना मज़ाक उड़वाओ
         </p>
     </header>
 
-    <main class="w-full max-w-3xl flex flex-col gap-6">
+    <main class="w-full max-w-2xl flex flex-col gap-6 relative z-10">
         
-        <!-- THE DROP ZONE (Upload Area) -->
-        <div id="dropZone" class="relative w-full h-48 terminal-border rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-green-900/20 transition group overflow-hidden">
+        <!-- THE DROP ZONE -->
+        <div id="dropZone" class="relative w-full h-56 rounded-xl flex flex-col items-center justify-center cursor-pointer group overflow-hidden bg-[#020b0e]">
             <div class="scan-line" id="scanLine"></div>
-            <i class="fa-solid fa-camera text-4xl mb-3 group-hover:scale-110 transition"></i>
-            <p class="text-lg font-bold">CLICK TO UPLOAD / DROP IMAGE</p>
-            <p class="text-xs text-green-800 mt-2">NO VIDEO. NO B.S. MAX 5MB.</p>
+            
+            <div class="flex flex-col items-center justify-center z-10 group-hover:scale-105 transition-transform duration-300">
+                <i class="fa-solid fa-cloud-arrow-up text-5xl text-cyan-500 mb-3 drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]"></i>
+                <p class="text-lg font-bold text-cyan-100">DROP IMAGE HERE</p>
+                <p class="text-xs text-cyan-700 mt-2 font-mono">MAX 5MB // JPG, PNG, WEBP</p>
+            </div>
+            
             <input type="file" id="imageInput" class="hidden" accept="image/*">
-            <img id="imagePreview" class="absolute inset-0 w-full h-full object-contain hidden bg-black/80 backdrop-blur-sm" alt="Preview">
+            
+            <!-- Image Preview Area -->
+            <img id="imagePreview" class="absolute inset-0 w-full h-full object-contain hidden bg-black/90 backdrop-blur-md z-10 p-2" alt="Preview">
         </div>
 
-        <!-- THE 7 MAGIC BUTTONS (Hidden until image uploads) -->
-        <div id="actionButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-            <!-- Button 1 -->
-            <button class="terminal-border p-3 text-left hover:bg-green-900/40 transition flex flex-col gap-1" data-action="drip">
-                <span class="font-bold text-white"><i class="fa-solid fa-shirt"></i> Drip Check (ब्रांड & रेट)</span>
-                <span class="text-xs text-green-600">असली माल है या सरोजिनी का जुगाड़? ब्रांड और अंदाज़न कीमत।</span>
+        <!-- THE 7 MAGIC BUTTONS -->
+        <div id="actionButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden mt-2">
+            
+            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="drip">
+                <span class="font-bold text-cyan-300 group-hover:text-white transition-colors"><i class="fa-solid fa-shirt mr-2"></i> Drip Check (ब्रांड & रेट)</span>
+                <span class="text-[11px] text-cyan-600/80">असली माल है या सरोजिनी का जुगाड़? ब्रांड और अंदाज़न कीमत।</span>
             </button>
-            <!-- Button 2 -->
-            <button class="terminal-border p-3 text-left hover:bg-green-900/40 transition flex flex-col gap-1" data-action="vibe">
-                <span class="font-bold text-white"><i class="fa-solid fa-sparkles"></i> Vibe Check (कैसा टाइप है?)</span>
-                <span class="text-xs text-green-600">पहाड़ या कैफे? इसका म्यूजिक टेस्ट और पर्सनैलिटी गेस।</span>
+            
+            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="vibe">
+                <span class="font-bold text-teal-300 group-hover:text-white transition-colors"><i class="fa-solid fa-sparkles mr-2"></i> Vibe Check (कैसा टाइप है?)</span>
+                <span class="text-[11px] text-teal-600/80">पहाड़ या कैफे? इसका म्यूजिक टेस्ट और पर्सनैलिटी गेस।</span>
             </button>
-            <!-- Button 3 -->
-            <button class="terminal-border p-3 text-left hover:bg-green-900/40 transition flex flex-col gap-1 border-red-500 text-red-500" data-action="roast">
-                <span class="font-bold text-white"><i class="fa-solid fa-fire"></i> Roast मारो (मीम बनाओ)</span>
-                <span class="text-xs text-red-800">भयंकर बेइज्जती और कड़क WhatsApp मीम कैप्शन।</span>
+            
+            <button class="cyber-border !border-red-900/50 hover:!border-red-500 p-4 text-left flex flex-col gap-1 group" data-action="roast">
+                <span class="font-bold text-red-400 group-hover:text-red-300 transition-colors"><i class="fa-solid fa-fire mr-2"></i> Roast मारो (मीम बनाओ)</span>
+                <span class="text-[11px] text-red-500/70">भयंकर बेइज्जती और कड़क WhatsApp मीम कैप्शन।</span>
             </button>
-            <!-- Button 4 -->
-            <button class="terminal-border p-3 text-left hover:bg-green-900/40 transition flex flex-col gap-1" data-action="fake">
-                <span class="font-bold text-white"><i class="fa-solid fa-magnifying-glass-chart"></i> असली या Fake? (पोल खोल)</span>
-                <span class="text-xs text-green-600">भारी फिल्टर, AI जनरेटेड या कोई स्कैम स्क्रीनशॉट?</span>
+            
+            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="fake">
+                <span class="font-bold text-emerald-400 group-hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i> असली या Fake? (पोल खोल)</span>
+                <span class="text-[11px] text-emerald-600/80">भारी फिल्टर, AI जनरेटेड या कोई स्कैम स्क्रीनशॉट?</span>
             </button>
-            <!-- Button 5 -->
-            <button class="terminal-border p-3 text-left hover:bg-green-900/40 transition flex flex-col gap-1" data-action="location">
-                <span class="font-bold text-white"><i class="fa-solid fa-earth-asia"></i> लोकेशन जासूस (कहाँ की है?)</span>
-                <span class="text-xs text-green-600">पीछे के पेड़/बिल्डिंग देखकर राज्य या शहर का अंदाज़ा।</span>
+            
+            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="location">
+                <span class="font-bold text-blue-300 group-hover:text-white transition-colors"><i class="fa-solid fa-earth-asia mr-2"></i> लोकेशन जासूस (कहाँ की है?)</span>
+                <span class="text-[11px] text-blue-500/70">पीछे के पेड़/बिल्डिंग देखकर राज्य या शहर का अंदाज़ा।</span>
             </button>
-            <!-- Button 6 -->
-            <button class="terminal-border p-3 text-left hover:bg-green-900/40 transition flex flex-col gap-1 border-yellow-500 text-yellow-500" data-action="utility">
-                <span class="font-bold text-white"><i class="fa-solid fa-screwdriver-wrench"></i> काम की बात (नंबर / सॉल्वर)</span>
-                <span class="text-xs text-yellow-700">गाड़ी की नंबर प्लेट, मैथ का सवाल या मोबाइल का एरर फिक्स।</span>
+            
+            <button class="cyber-border !border-yellow-900/50 hover:!border-yellow-400 p-4 text-left flex flex-col gap-1 group" data-action="utility">
+                <span class="font-bold text-yellow-400 group-hover:text-yellow-200 transition-colors"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> काम की बात (नंबर / सॉल्वर)</span>
+                <span class="text-[11px] text-yellow-600/80">गाड़ी की नंबर प्लेट, मैथ का सवाल या मोबाइल का एरर फिक्स।</span>
             </button>
-            <!-- Button 7 (Master Button) -->
-            <button class="terminal-border p-3 text-center hover:bg-green-900/40 transition flex flex-col gap-1 md:col-span-2 border-white text-white" data-action="deepscan">
-                <span class="font-bold text-lg"><i class="fa-solid fa-user-ninja"></i> पूरा कच्चा चिट्ठा (Deep Scan)</span>
-                <span class="text-xs text-gray-400">फोटो का पूरा एक्स-रे, A to Z सारी कुंडली एक पैराग्राफ में।</span>
+            
+            <button class="cyber-border p-4 text-center flex flex-col items-center justify-center gap-1 md:col-span-2 !border-cyan-400 hover:bg-cyan-900/20 group" data-action="deepscan">
+                <span class="font-bold text-lg text-white glow-text"><i class="fa-solid fa-user-ninja mr-2"></i> पूरा कच्चा चिट्ठा (Deep Scan)</span>
+                <span class="text-xs text-cyan-400/60 mt-1">फोटो का पूरा एक्स-रे, A to Z सारी कुंडली एक पैराग्राफ में।</span>
             </button>
         </div>
 
         <!-- FBI TERMINAL LOADING STATE -->
-        <div id="loadingTerminal" class="terminal-border p-4 h-40 hidden flex-col justify-end bg-black font-['Share_Tech_Mono'] text-sm">
-            <div id="terminalText" class="text-green-500"></div>
-            <div>> <span class="cursor"></span></div>
+        <div id="loadingTerminal" class="cyber-border p-5 h-48 hidden flex-col justify-end bg-black/80 font-['Share_Tech_Mono'] text-sm">
+            <div id="terminalText" class="text-cyan-400 space-y-1"></div>
+            <div class="mt-2 text-cyan-300">> <span class="cursor"></span></div>
         </div>
 
-        <!-- 📦 RESULT UI (The 4 Boxes) -->
-        <div id="resultContainer" class="hidden flex flex-col gap-4">
+        <!-- RESULT UI -->
+        <div id="resultContainer" class="hidden flex flex-col gap-5">
             
             <!-- Box 1: Profile & Status -->
-            <div class="terminal-border p-4 flex items-center gap-4 bg-green-950/20">
-                <div class="w-16 h-16 rounded-full border-2 border-green-500 overflow-hidden shrink-0">
+            <div class="cyber-border p-4 flex items-center gap-4 bg-cyan-950/20">
+                <div class="w-16 h-16 rounded-full border-2 border-cyan-400 overflow-hidden shrink-0 shadow-[0_0_10px_rgba(0,240,255,0.5)]">
                     <img id="resultThumb" src="" alt="thumb" class="w-full h-full object-cover">
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-xs text-green-700">TARGET ACQUIRED</span>
-                    <span class="font-bold text-white glow-text" id="statusHeader">STATUS: SCANNED</span>
+                    <span class="text-xs text-cyan-600 font-bold tracking-widest">TARGET ACQUIRED</span>
+                    <span class="font-bold text-white glow-text text-lg tracking-widest mt-1" id="statusHeader">STATUS: SCANNED</span>
                 </div>
             </div>
 
-            <!-- Box 2: The Core Intel (Typewriter Box) -->
-            <div class="terminal-border p-4 bg-black min-h-[100px] relative">
-                <p id="coreIntelText" class="whitespace-pre-line leading-relaxed text-gray-200"></p>
+            <!-- Box 2: The Core Intel -->
+            <div class="cyber-border p-5 bg-[#020b0e] min-h-[120px] relative">
+                <p id="coreIntelText" class="whitespace-pre-line leading-relaxed text-cyan-50 font-sans tracking-wide"></p>
                 <span id="intelCursor" class="cursor hidden"></span>
             </div>
 
-            <!-- Box 3: Quick Tags & Extra Links (Lab Link goes here!) -->
+            <!-- Box 3: Quick Tags -->
             <div id="quickTags" class="flex flex-wrap gap-2 text-xs">
-                <!-- Data will be injected via JS -->
+                <!-- Special Lab Button Injects Here via JS -->
             </div>
 
             <!-- Box 4: Share / Viral Box -->
-            <button id="generateOGBtn" class="terminal-border p-3 bg-green-800 text-black font-bold hover:bg-green-600 transition flex justify-center items-center gap-2">
-                <i class="fa-brands fa-whatsapp text-xl"></i> RESULT को WhatsApp पर पेलें 
+            <button id="generateOGBtn" class="border border-green-500 bg-green-900/30 hover:bg-green-600 text-white p-4 rounded-lg font-bold transition flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(0,255,0,0.2)]">
+                <i class="fa-brands fa-whatsapp text-2xl text-green-400"></i> RESULT को WhatsApp पर पेलें 
             </button>
-            <p class="text-center text-[10px] text-green-900 mt-1">Images are processed & deleted. We respect privacy.</p>
+            <p class="text-center text-[10px] text-cyan-800/60 font-mono">IMAGES ARE PROCESSED & DELETED. WE RESPECT PRIVACY.</p>
         </div>
 
     </main>
 
-    <!-- AdSense Space for Loading Time -->
-    <div id="adSpace" class="mt-8 w-full max-w-3xl text-center hidden">
-        <p class="text-xs text-green-900 mb-2">[ COMMUNICATING WITH SECURE SATELLITE... ]</p>
-        <!-- AdSense Code will go here -->
-    </div>
-<!-- JS लिंक करो -->
-<script src="app.js"></script>
-    
+    <!-- JS Link -->
+    <script src="app.js"></script>
 </body>
 </html>
 
