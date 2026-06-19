@@ -1,22 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>i-CID | Photo Ka Kachcha Chittha</title>
-    
-    <!-- CSS Link (For terminal flicker effect) -->
+    <title>i-CID | Image Forensic System</title>
+
     <link rel="stylesheet" href="style.css">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts for Hacker/Terminal Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RZ70BC6S32"></script>
     <script>
@@ -27,55 +19,95 @@
     </script>
 
     <style>
-        /* Modern Cyberpunk Blue-Green Theme */
+        /* Color palette matched to i-CID logo: blue-cyan-white gradient on black */
         :root {
-            --cyber-cyan: #00f0ff;
-            --cyber-green: #08f26e;
-            --cyber-dark: #020b0e;
+            --bg-base: #0a0e14;
+            --bg-panel: #11161f;
+            --bg-panel-light: #161c28;
+            --accent-blue: #2e9bf0;
+            --accent-cyan: #4fd8e8;
+            --accent-white: #f0f4f8;
+            --border-subtle: rgba(79, 216, 232, 0.18);
+            --border-active: rgba(79, 216, 232, 0.55);
+            --text-dim: #6b7889;
+            --text-mid: #9aa6b5;
+            --success: #2ecc8f;
+            --warning: #f0a93e;
         }
-        
+
         body {
-            background-color: var(--cyber-dark);
-            color: var(--cyber-cyan);
-            font-family: 'Fira Code', monospace;
-            background-image: radial-gradient(circle at top, #04212b 0%, var(--cyber-dark) 70%);
+            background-color: var(--bg-base);
+            color: var(--accent-white);
+            font-family: 'Inter', sans-serif;
+            background-image:
+                radial-gradient(circle at 50% -10%, rgba(46, 155, 240, 0.12) 0%, transparent 50%);
             min-height: 100vh;
         }
 
-        .cyber-border {
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            background: rgba(4, 33, 43, 0.4);
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
-            backdrop-filter: blur(5px);
-            border-radius: 8px;
+        .mono { font-family: 'Space Mono', monospace; }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
         }
 
-        .cyber-border:hover {
-            border-color: var(--cyber-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        .panel-interactive {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            transition: border-color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+        }
+        .panel-interactive:hover {
+            border-color: var(--border-active);
+            background: var(--bg-panel-light);
+        }
+        .panel-interactive:active {
+            transform: scale(0.985);
         }
 
-        .glow-text {
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
-            background: -webkit-linear-gradient(45deg, var(--cyber-cyan), var(--cyber-green));
+        .gradient-text {
+            background: linear-gradient(90deg, var(--accent-white) 0%, var(--accent-cyan) 60%, var(--accent-blue) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* Scan Line for Drop Zone */
+        .icon-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Drop Zone — clean dashed style matching reference screenshots */
+        #dropZone {
+            border: 2px dashed var(--border-subtle);
+            border-radius: 16px;
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+        #dropZone.drag-active,
+        #dropZone:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(79, 216, 232, 0.04);
+        }
+
+        /* Scan line animation during upload preview */
         .scan-line {
             width: 100%;
             height: 2px;
-            background-color: var(--cyber-cyan);
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
             position: absolute;
             top: 0;
             left: 0;
-            box-shadow: 0 0 15px 2px var(--cyber-cyan);
+            box-shadow: 0 0 12px 1px var(--accent-cyan);
             animation: scan 2s infinite linear;
             display: none;
             z-index: 20;
         }
-
         @keyframes scan {
             0% { top: 0%; opacity: 0; }
             10% { opacity: 1; }
@@ -83,139 +115,280 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Typewriter Cursor */
-        .cursor {
+        .cursor-blink {
             display: inline-block;
-            width: 8px;
-            height: 15px;
-            background-color: var(--cyber-cyan);
+            width: 7px;
+            height: 14px;
+            background-color: var(--accent-cyan);
             animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            border-radius: 1px;
         }
-
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* Custom Drop Zone Styling */
-        #dropZone {
-            border: 2px dashed rgba(0, 240, 255, 0.5);
-            transition: all 0.3s ease;
+        .disclaimer-badge {
+            font-size: 11.5px;
+            color: var(--warning);
+            border: 1px solid rgba(240, 169, 62, 0.25);
+            background: rgba(240, 169, 62, 0.06);
+            padding: 10px 12px;
+            border-radius: 10px;
+            line-height: 1.5;
         }
-        #dropZone:hover {
-            border-color: var(--cyber-green);
-            background: rgba(0, 240, 255, 0.05);
+
+        .trust-pill {
+            font-size: 11px;
+            color: var(--text-mid);
+            border: 1px solid var(--border-subtle);
+            padding: 5px 11px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
+
+        #exitToast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--bg-panel-light);
+            border: 1px solid var(--border-active);
+            color: var(--accent-white);
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 13px;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        #exitToast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #backBtn {
+            transition: all 0.2s ease;
+        }
+        #backBtn:active {
+            transform: scale(0.92);
+        }
+
+        /* Action button layout */
+        .action-btn {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            text-align: left;
+        }
+        .action-btn-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--accent-white);
+        }
+        .action-btn-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 3px; }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col items-center">
+<body class="px-4 py-6 md:py-10 flex flex-col items-center">
 
-    <!-- Header Section -->
-    <header class="text-center mb-8 w-full max-w-3xl mt-4">
-        <h1 class="text-4xl md:text-5xl font-bold tracking-widest font-['Share_Tech_Mono'] mb-2">
-            <i class="fa-solid fa-user-secret text-cyan-400"></i> <span class="glow-text">i-CID</span>
-        </h1>
-        <p class="text-xs md:text-sm text-cyan-600/80 font-semibold tracking-wider">
-            [SYSTEM DETECTED] // अपनी फोटो डालो, अपना मज़ाक उड़वाओ
-        </p>
+    <!-- Animated Detective/CID background -->
+    <div class="bg-fx">
+        <span class="particle" style="left:10%; animation-duration:14s; animation-delay:0s;"></span>
+        <span class="particle" style="left:25%; animation-duration:18s; animation-delay:3s;"></span>
+        <span class="particle" style="left:45%; animation-duration:12s; animation-delay:1s;"></span>
+        <span class="particle" style="left:62%; animation-duration:20s; animation-delay:5s;"></span>
+        <span class="particle" style="left:78%; animation-duration:15s; animation-delay:2s;"></span>
+        <span class="particle" style="left:90%; animation-duration:17s; animation-delay:4s;"></span>
+    </div>
+
+
+    <!-- Header -->
+    <header class="w-full max-w-xl mb-7 relative flex items-center justify-center">
+        <button id="backBtn" class="hidden absolute left-0 panel w-10 h-10 rounded-full items-center justify-center text-cyan-200">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+
+        <div class="flex flex-col items-center text-center">
+            <div class="flex items-center gap-2.5 mb-1.5">
+                <!-- Inline SVG logo mark - fingerprint + magnifier, matches uploaded logo style -->
+                <svg width="34" height="34" viewBox="0 0 48 48" fill="none" class="logo-mark">
+                    <circle cx="24" cy="24" r="21" stroke="url(#ringGrad)" stroke-width="2.5"/>
+                    <path d="M17 14a10 10 0 0 1 14 0" stroke="#4fd8e8" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <circle cx="24" cy="22" r="5.5" stroke="#2e9bf0" stroke-width="1.6" fill="none"/>
+                    <path d="M21.5 19.5c1.4-1 3.6-1 5 0M20.5 22c2-1.4 5.5-1.4 7.5 0M21 24.5c1.6-1 4.4-1 6 0" stroke="#2e9bf0" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+                    <line x1="29" y1="28" x2="34" y2="33" stroke="#f0f4f8" stroke-width="2.4" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="ringGrad" x1="0" y1="0" x2="48" y2="48">
+                            <stop offset="0%" stop-color="#4fd8e8"/>
+                            <stop offset="100%" stop-color="#2e9bf0"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1 class="text-3xl font-extrabold tracking-tight gradient-text">i-CID</h1>
+            </div>
+            <p class="text-xs text-[var(--text-mid)] font-medium">इमेज फॉरेंसिक सिस्टम — फोटो की पूरी सच्चाई</p>
+        </div>
     </header>
 
-    <main class="w-full max-w-2xl flex flex-col gap-6 relative z-10">
-        
-        <!-- THE DROP ZONE -->
-        <div id="dropZone" class="relative w-full h-56 rounded-xl flex flex-col items-center justify-center cursor-pointer group overflow-hidden bg-[#020b0e]">
+    <main class="w-full max-w-xl flex flex-col gap-5 relative z-10">
+
+        <!-- DROP ZONE -->
+        <div id="dropZone" class="relative w-full h-52 flex flex-col items-center justify-center cursor-pointer overflow-hidden">
+            <span class="corner tl"></span>
+            <span class="corner tr"></span>
+            <span class="corner bl"></span>
+            <span class="corner br"></span>
+            <div class="idle-scan"></div>
             <div class="scan-line" id="scanLine"></div>
-            
-            <div class="flex flex-col items-center justify-center z-10 group-hover:scale-105 transition-transform duration-300">
-                <i class="fa-solid fa-cloud-arrow-up text-5xl text-cyan-500 mb-3 drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]"></i>
-                <p class="text-lg font-bold text-cyan-100">DROP IMAGE HERE</p>
-                <p class="text-xs text-cyan-700 mt-2 font-mono">MAX 5MB // JPG, PNG, WEBP</p>
+
+            <div id="dropZoneContent" class="flex flex-col items-center justify-center z-10 px-6">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4fd8e8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="mb-3 upload-icon">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p class="text-base font-semibold text-[var(--accent-white)]">फोटो यहाँ डालो</p>
+                <p class="text-[11px] text-[var(--text-dim)] mt-1.5 mono">मैक्स 5MB · JPG / PNG / WEBP</p>
             </div>
-            
+
             <input type="file" id="imageInput" class="hidden" accept="image/*">
-            
-            <!-- Image Preview Area -->
-            <img id="imagePreview" class="absolute inset-0 w-full h-full object-contain hidden bg-black/90 backdrop-blur-md z-10 p-2" alt="Preview">
+            <img id="imagePreview" class="absolute inset-0 w-full h-full object-contain hidden bg-black z-10 p-2 rounded-2xl" alt="Preview">
         </div>
 
-        <!-- THE 7 MAGIC BUTTONS -->
-        <div id="actionButtons" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden mt-2">
-            
-            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="drip">
-                <span class="font-bold text-cyan-300 group-hover:text-white transition-colors"><i class="fa-solid fa-shirt mr-2"></i> Drip Check (ब्रांड & रेट)</span>
-                <span class="text-[11px] text-cyan-600/80">असली माल है या सरोजिनी का जुगाड़? ब्रांड और अंदाज़न कीमत।</span>
+        <!-- Trust pills - matches reference screenshot style -->
+        <div id="trustPills" class="flex flex-wrap justify-center gap-2">
+            <span class="trust-pill">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                प्रोसेस करके डिलीट
+            </span>
+            <span class="trust-pill">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                इंस्टेंट रिजल्ट
+            </span>
+            <span class="trust-pill">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7v6c0 5.5 4.5 9.7 10 11 5.5-1.3 10-5.5 10-11V7l-10-5z"/></svg>
+                AI का अंदाज़ा
+            </span>
+        </div>
+
+        <!-- THE 5 ANALYSIS BUTTONS -->
+        <div id="actionButtons" class="grid grid-cols-1 gap-3 hidden mt-1">
+
+            <button class="panel-interactive action-btn" data-action="fake">
+                <div class="icon-badge" style="background: rgba(46,204,143,0.12);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M8 11l2 2 4-4"/></svg>
+                </div>
+                <div>
+                    <div class="action-btn-title">असली या फेक?</div>
+                    <div class="action-btn-desc">AI-एडिटेड, हैवी फिल्टर, AI-जनरेटेड इमेज, या स्कैम स्क्रीनशॉट की जाँच।</div>
+                </div>
             </button>
-            
-            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="vibe">
-                <span class="font-bold text-teal-300 group-hover:text-white transition-colors"><i class="fa-solid fa-sparkles mr-2"></i> Vibe Check (कैसा टाइप है?)</span>
-                <span class="text-[11px] text-teal-600/80">पहाड़ या कैफे? इसका म्यूजिक टेस्ट और पर्सनैलिटी गेस।</span>
+
+            <button class="panel-interactive action-btn" data-action="brand">
+                <div class="icon-badge" style="background: rgba(46,155,240,0.12);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e9bf0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+                </div>
+                <div>
+                    <div class="action-btn-title">ब्रांड एंड कीमत</div>
+                    <div class="action-btn-desc">ब्रांड पहचान, असली/डुप्लीकेट का अंदाज़ा, अनुमानित कीमत रेंज।</div>
+                </div>
             </button>
-            
-            <button class="cyber-border !border-red-900/50 hover:!border-red-500 p-4 text-left flex flex-col gap-1 group" data-action="roast">
-                <span class="font-bold text-red-400 group-hover:text-red-300 transition-colors"><i class="fa-solid fa-fire mr-2"></i> Roast मारो (मीम बनाओ)</span>
-                <span class="text-[11px] text-red-500/70">भयंकर बेइज्जती और कड़क WhatsApp मीम कैप्शन।</span>
+
+            <button class="panel-interactive action-btn" data-action="utility">
+                <div class="icon-badge" style="background: rgba(240,169,62,0.12);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f0a93e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
+                <div>
+                    <div class="action-btn-title">काम की बात</div>
+                    <div class="action-btn-desc">नंबर प्लेट, मैथ सॉल्वर, एरर स्क्रीनशॉट फिक्स, या डॉक्यूमेंट चेक।</div>
+                </div>
             </button>
-            
-            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="fake">
-                <span class="font-bold text-emerald-400 group-hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i> असली या Fake? (पोल खोल)</span>
-                <span class="text-[11px] text-emerald-600/80">भारी फिल्टर, AI जनरेटेड या कोई स्कैम स्क्रीनशॉट?</span>
+
+            <button class="panel-interactive action-btn" data-action="device">
+                <div class="icon-badge" style="background: rgba(79,216,232,0.12);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4fd8e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div>
+                    <div class="action-btn-title">कैमरा या मोबाइल?</div>
+                    <div class="action-btn-desc">फोटो प्रोफेशनल कैमरा, मोबाइल, या AI/एडिट टूल से बनी — अंदाज़ा।</div>
+                </div>
             </button>
-            
-            <button class="cyber-border p-4 text-left flex flex-col gap-1 group" data-action="location">
-                <span class="font-bold text-blue-300 group-hover:text-white transition-colors"><i class="fa-solid fa-earth-asia mr-2"></i> लोकेशन जासूस (कहाँ की है?)</span>
-                <span class="text-[11px] text-blue-500/70">पीछे के पेड़/बिल्डिंग देखकर राज्य या शहर का अंदाज़ा।</span>
-            </button>
-            
-            <button class="cyber-border !border-yellow-900/50 hover:!border-yellow-400 p-4 text-left flex flex-col gap-1 group" data-action="utility">
-                <span class="font-bold text-yellow-400 group-hover:text-yellow-200 transition-colors"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> काम की बात (नंबर / सॉल्वर)</span>
-                <span class="text-[11px] text-yellow-600/80">गाड़ी की नंबर प्लेट, मैथ का सवाल या मोबाइल का एरर फिक्स।</span>
-            </button>
-            
-            <button class="cyber-border p-4 text-center flex flex-col items-center justify-center gap-1 md:col-span-2 !border-cyan-400 hover:bg-cyan-900/20 group" data-action="deepscan">
-                <span class="font-bold text-lg text-white glow-text"><i class="fa-solid fa-user-ninja mr-2"></i> पूरा कच्चा चिट्ठा (Deep Scan)</span>
-                <span class="text-xs text-cyan-400/60 mt-1">फोटो का पूरा एक्स-रे, A to Z सारी कुंडली एक पैराग्राफ में।</span>
+
+            <button class="panel-interactive action-btn" style="border-color: var(--border-active); background: linear-gradient(135deg, rgba(46,155,240,0.08), rgba(79,216,232,0.04));" data-action="deepscan">
+                <div class="icon-badge" style="background: linear-gradient(135deg, rgba(46,155,240,0.18), rgba(79,216,232,0.18));">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4fd8e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                </div>
+                <div>
+                    <div class="action-btn-title">पूरा कच्चा चिट्ठा (डीप स्कैन)</div>
+                    <div class="action-btn-desc">फोटो की पूरी रिपोर्ट, एक पैराग्राफ में A से Z तक।</div>
+                </div>
             </button>
         </div>
 
-        <!-- FBI TERMINAL LOADING STATE -->
-        <div id="loadingTerminal" class="cyber-border p-5 h-48 hidden flex-col justify-end bg-black/80 font-['Share_Tech_Mono'] text-sm">
-            <div id="terminalText" class="text-cyan-400 space-y-1"></div>
-            <div class="mt-2 text-cyan-300">> <span class="cursor"></span></div>
+        <!-- LOADING STATE -->
+        <div id="loadingTerminal" class="panel p-5 hidden flex-col justify-center items-center gap-4">
+            <div class="radar-ring"></div>
+            <div class="scanner-box">
+                <div class="sweep"></div>
+            </div>
+            <div id="terminalText" class="mono text-[12px] text-[var(--accent-cyan)] text-center min-h-[18px] glitch"></div>
         </div>
 
         <!-- RESULT UI -->
-        <div id="resultContainer" class="hidden flex flex-col gap-5">
-            
-            <!-- Box 1: Profile & Status -->
-            <div class="cyber-border p-4 flex items-center gap-4 bg-cyan-950/20">
-                <div class="w-16 h-16 rounded-full border-2 border-cyan-400 overflow-hidden shrink-0 shadow-[0_0_10px_rgba(0,240,255,0.5)]">
+        <div id="resultContainer" class="hidden flex flex-col gap-4">
+
+            <div class="panel p-4 flex items-center gap-3.5">
+                <div class="thumb-wrap w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[var(--border-subtle)]">
                     <img id="resultThumb" src="" alt="thumb" class="w-full h-full object-cover">
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-xs text-cyan-600 font-bold tracking-widest">TARGET ACQUIRED</span>
-                    <span class="font-bold text-white glow-text text-lg tracking-widest mt-1" id="statusHeader">STATUS: SCANNED</span>
+                    <span class="text-[10px] text-[var(--text-dim)] font-semibold tracking-wider uppercase"><span class="live-dot"></span>स्कैन कम्पलीट</span>
+                    <span class="font-bold text-[var(--accent-white)] text-base mt-0.5" id="statusHeader">रिपोर्ट तैयार</span>
                 </div>
             </div>
 
-            <!-- Box 2: The Core Intel -->
-            <div class="cyber-border p-5 bg-[#020b0e] min-h-[120px] relative">
-                <p id="coreIntelText" class="whitespace-pre-line leading-relaxed text-cyan-50 font-sans tracking-wide"></p>
-                <span id="intelCursor" class="cursor hidden"></span>
+            <div class="panel p-5 min-h-[110px] relative">
+                <p id="coreIntelText" class="whitespace-pre-line leading-relaxed text-[var(--accent-white)] text-[14.5px]"></p>
+                <span id="intelCursor" class="cursor-blink hidden"></span>
             </div>
 
-            <!-- Box 3: Quick Tags -->
-            <div id="quickTags" class="flex flex-wrap gap-2 text-xs">
-                <!-- Special Lab Button Injects Here via JS -->
+            <div class="disclaimer-badge flex items-start gap-2.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>ये AI का अंदाज़ा (एस्टीमेट) है, 100% गारंटी नहीं। सरकारी/लीगल काम के लिए ऑफिशियल सोर्स से वेरिफाई करें।</span>
             </div>
 
-            <!-- Box 4: Share / Viral Box -->
-            <button id="generateOGBtn" class="border border-green-500 bg-green-900/30 hover:bg-green-600 text-white p-4 rounded-lg font-bold transition flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(0,255,0,0.2)]">
-                <i class="fa-brands fa-whatsapp text-2xl text-green-400"></i> RESULT को WhatsApp पर पेलें 
+            <button id="generateOGBtn" class="text-white p-3.5 rounded-xl font-semibold transition flex justify-center items-center gap-2.5 text-[14px]" style="background: linear-gradient(135deg, #25d366, #1ea952);">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 2.121.553 4.115 1.523 5.84L0 24l6.293-1.498A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm5.96 16.95c-.262.737-1.296 1.396-1.78 1.47-.484.073-.92.32-3.1-.65-2.613-1.17-4.293-3.96-4.426-4.143-.133-.183-1.083-1.44-1.083-2.747 0-1.306.687-1.95.93-2.217.243-.267.53-.333.707-.333.177 0 .353.002.507.01.163.007.382-.062.597.456.22.533.747 1.823.813 1.957.066.133.11.29.022.466-.088.176-.132.286-.264.44-.132.155-.278.346-.397.464-.132.132-.27.275-.116.54.155.265.687 1.135 1.476 1.84 1.014.893 1.873 1.17 2.138 1.302.265.132.42.11.575-.066.155-.177.66-.768.838-1.033.176-.265.353-.22.596-.132.243.088 1.54.726 1.804.858.265.132.44.198.507.31.066.11.066.64-.196 1.377z"/></svg>
+                रिपोर्ट WhatsApp पर भेजो
             </button>
-            <p class="text-center text-[10px] text-cyan-800/60 font-mono">IMAGES ARE PROCESSED & DELETED. WE RESPECT PRIVACY.</p>
+
+            <button id="newScanBtn" class="panel-interactive p-3 text-[var(--accent-cyan)] text-[13px] font-semibold flex items-center justify-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                नई फोटो स्कैन करो
+            </button>
         </div>
 
     </main>
 
-    <!-- JS Link -->
-    <script src="app.js?v=2"></script>
+    <footer class="w-full max-w-xl mt-8 text-center">
+        <p class="text-[10.5px] text-[var(--text-dim)]">तुम्हारी फोटो प्रोसेस होकर डिलीट हो जाती है। प्राइवेसी का पूरा ध्यान।</p>
+    </footer>
+
+    <!-- Exit confirmation toast -->
+    <div id="exitToast">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" class="inline mr-1.5 -mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        एक बार और बैक दबाओ बाहर निकलने के लिए
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
-
