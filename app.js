@@ -12,6 +12,7 @@ const COMPRESS_QUALITY = 0.75;
 // ---- DOM ELEMENTS ----
 const dropZone = document.getElementById('dropZone');
 const imageInput = document.getElementById('imageInput');
+const cameraInput = document.getElementById('cameraInput');
 const imagePreview = document.getElementById('imagePreview');
 const scanLine = document.getElementById('scanLine');
 const actionButtons = document.getElementById('actionButtons');
@@ -48,6 +49,13 @@ const buttonMeta = {
     cheap:    { label: "सस्ता या महँगा?",  color: "#e8c44f", icon: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' },
     quality:  { label: "कपड़े की क्वालिटी", color: "#c44ff0", icon: '<path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>' },
     utility:  { label: "काम की बात",       color: "#f0a93e", icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
+    factcheck:{ label: "क्या लिखा है? 📰",  color: "#5cc8a8", icon: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/>' },
+    food:     { label: "खाना चेक 🍽️",      color: "#f06d5c", icon: '<path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M5 2v20"/><path d="M17 2v20"/><path d="M21 7c0-2.8-1.8-5-4-5v20"/>' },
+    weather:  { label: "मौसम अलर्ट 🌦️",    color: "#5cb8f0", icon: '<path d="M16 13a4 4 0 1 0-8 0"/><circle cx="12" cy="5" r="2.5"/><line x1="12" y1="16" x2="12" y2="20"/><line x1="8" y1="17" x2="8" y2="21"/><line x1="16" y1="17" x2="16" y2="21"/>' },
+    plant:    { label: "पौधा पहचानो 🌱",    color: "#5cc85c", icon: '<path d="M12 22V8"/><path d="M12 8C12 4 8 2 4 2c0 4 2 8 8 8z"/><path d="M12 12c0-3 3-5 7-5 0 3-2 6-7 6z"/>' },
+    pet:      { label: "पालतू/जानवर 🐾",    color: "#d4a05c", icon: '<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="4" cy="8" r="2"/><circle cx="6" cy="15" r="2"/><path d="M11 9c-3 0-5 2.5-5 5.5 0 2 1.5 3.5 3.5 3.5 1 0 1.5-.5 2.5-.5s1.5.5 2.5.5c2 0 3.5-1.5 3.5-3.5C19 11.5 14 9 11 9z"/>' },
+    color:    { label: "रंग मैच 🎨",        color: "#c45cf0", icon: '<circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4.5-8-10-8z"/>' },
+    recipe:   { label: "रेसिपी 👨‍🍳",       color: "#f0a05c", icon: '<path d="M15 11h.01M11 15h.01M16 16h.01"/><path d="M2 16c0-3 2.5-3 2.5-6C4.5 7 7 4 12 4s7.5 3 7.5 6c0 3 2.5 3 2.5 6"/><path d="M2 16h20v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2z"/>' },
     device:   { label: "कैमरा या मोबाइल?", color: "#4fd8e8", icon: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>' },
     daynight: { label: "दिन या रात?",      color: "#f0843e", icon: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>' },
     ghost:    { label: "भूत या भ्रम? 👻",  color: "#9aa6f0", icon: '<path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 3 3 2-3 2 3 3-3V10a8 8 0 0 0-8-8z"/>' },
@@ -139,7 +147,75 @@ TONE: 70% science + 30% mazedaar. Halka spooky-fun andaaz par end mein hamesha s
 2. Agar koi purani imaarat/cheez hai to woh kitni purani ho sakti hai (andaazan daur/era)?
 3. Photo khud kitni purani lagti hai (recent click ya scan ki hui purani photo)?
 Confident na ho to "lagta hai", "ho sakta hai" use kar. Specific saal sirf tab bol jab pakka ho.
-TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 3-4 lines.`
+TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 3-4 lines.`,
+
+    factcheck: `Tu ek responsible fact-check assistant hai jo image mein likha text padh kar uska summary deta hai aur verify karne ke official sources batata hai. Is image ko dekh:
+
+1. TEXT PADHO: Image mein jo bhi likha hai (newspaper cutting, news screenshot, WhatsApp forward, notice, poster, document) usko padh kar bata ki kya likha/dava (claim) kiya gaya hai. Summary 2-3 lines mein.
+
+2. MAIN CLAIMS: Jo bade dave hain unhe point out kar (jaise "isme dava hai ki X ne Y kiya").
+
+3. HONEST DISCLAIMER (bahut zaroori): Saaf bol ki "Main image ka text padh sakta hoon, par live internet se confirm nahi kar sakta ki yeh sach hai ya fake. Isliye main khud 'sach' ya 'jhooth' nahi bol raha — neeche diye official sources pe khud verify karo."
+
+4. KABHI BHI confidently yeh mat bol ki news "100% sach" hai ya "100% fake" hai. Agar koi cheez clearly suspicious lagti hai (jaise galat grammar, sansani-khez dava, source ka naam nahi), to sirf itna bol "yeh signs dikhte hain jo shak paida karte hain, verify zaroor karo".
+
+5. OFFICIAL SOURCES (har baar yeh links de):
+- "PIB Fact Check (sarkari fake news checker): https://factcheck.pib.gov.in"
+- Agar news kisi specific topic ki hai to uska official source bhi bata (jaise: court/legal news → "Supreme Court: https://www.sci.gov.in", election → "ECI: https://www.eci.gov.in", railway → "https://www.indianrailways.gov.in", health → "https://www.mohfw.gov.in", weather → "IMD: https://mausam.imd.gov.in"). Jo relevant ho wahi.
+
+Agar image mein koi padhne layak text nahi hai, bol do "is image mein koi saaf text nahi mila jo fact-check ho sake."
+
+TONE: 70% factual + 30% halka witty, par fact-check mein zyada serious raho (galat info phailana risky hai). Hinglish PAR Devanagari script mein, 5-6 lines. Links exactly jaise diye hain waise hi likhna.`,
+
+    food: `Tu ek khane ka jaankaar dost hai jo plate dekh kar batata hai ki kya khaane wale ho — factual par mazedaar. Is image mein dikhne wale khane ko dekh:
+1. Yeh kya khana hai (pehchano)?
+2. Yeh healthy hai, junk hai, ya balanced? Kyun (fried/oily, meetha, protein, sabzi se)?
+3. Motā-motī andaaza — bhaari khana hai ya halka, pet bharega ya snack hai?
+4. Ek general tip (jaise "saath mein salad/dahi lo", "roz mat khao", "paani zyada piyo").
+
+BAHUT ZAROORI SAFETY: Koi specific calorie number, diet plan, ya weight ka target MAT do. Kisi ko yeh mat bolo ki "tumhe yeh bimari hai" ya "yeh khaane se kidney/dil kharab hoga". Sirf general awareness do. Ant mein halka note: "Yeh general jaankari hai bhai, personal diet plan ke liye dietitian se poochho — main CID hoon, doctor nahi! 😄"
+TONE: 70% factual + 30% witty. Mazaak khane pe, kisi insaan ke weight/body pe NAHI. Hinglish PAR Devanagari script mein, 4-5 lines.`,
+
+    weather: `Tu ek environment observer hai jo photo dekh kar mausam aur aas-paas ka haal batata hai. Is image ko dekh:
+1. Dhoop kaisी hai (tez/halki/nahi)? Mausam garmi, sardi, ya normal lagta hai?
+2. Aasman/baadal se kya lagta hai — baarish aa sakti hai ya saaf hai?
+3. Bheed dikh rahi hai kya? Jagah khuli hai ya band?
+4. Iske hisaab se ek practical salah (jaise "tez dhoop hai, ORS/paani pi le aur dhoop mein kam niklo", "baadal hain, chhata saath le ja", "kaafi bheed hai, sambhal ke").
+
+Yeh sab andaaza hai photo se — confident na ho to bol do. Health emergency ya serious cheez pe doctor/authority se poochne ko bol.
+TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 4-5 lines.`,
+
+    plant: `Tu ek paudhon ka jaankaar (botany-friendly) hai. Is image mein dikhne wale paudhe/ped ko dekh:
+1. Yeh kaunsa paudha lagta hai (naam ka andaaza, confident na ho to "lagta hai")?
+2. Ghar mein rakhne layak hai ya bahar ka? Dekhbhaal kaisी (paani kitna, dhoop chahiye ya chhaon)?
+3. SAFETY: Agar yeh zeharila (toxic) ho sakta hai (bachhon/pets ke liye) to general warning do — "yeh paudha zeharila ho sakta hai, bachhon/pets se door rakho, khaana mat".
+
+BAHUT ZAROORI: Kabhi yeh mat bolo ki "yeh paudha khao", "isse dawa banao", ya "yeh bimari theek karega". Koi medicinal/herbal treatment salah NAHI. Sirf pehchान aur dekhbhaal. Confident na ho to bol do "pakka pehchान ke liye kisi nursery/expert se poochho".
+TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 4-5 lines.`,
+
+    pet: `Tu ek animal/pet lover jaankaar hai. Is image mein dikhne wale jaanwar/pet ko dekh:
+1. Yeh kaunsa jaanwar/nasl (breed) lagta hai (andaaza, confident na ho to "lagta hai")?
+2. Agar pet hai to general care — kya khilana theek rahega, kitni dekhbhaal chahiye, swabhaav kaisा hota hai?
+3. Agar jungli/awara jaanwar hai to bol do "door se dekho, pareshan mat karo, kuch jungli jaanwar khatarnak ho sakte hain".
+
+BAHUT ZAROORI: Koi medical/health diagnosis MAT do (jaise "isko yeh bimari hai" ya "yeh dawa do"). Agar jaanwar bimar/ghayal lage to sirf bol do "kisi vet (animal doctor) ko turant dikhao". Sirf general pehchान aur care.
+TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 4-5 lines.`,
+
+    color: `Tu ek fashion/color expert hai jo rang aur match batata hai. Is image ko dekh:
+1. Isme kaunse main colors hain (pehchano)?
+2. Yeh rang kis cheez ke saath achha match karega (kapde, accessories, room decor)?
+3. Yeh combo formal lagta hai, casual, ya festive? Kis occasion ke liye theek?
+4. Ek style tip.
+TONE: 70% factual + 30% witty. Mazaak style/color pe, insaan pe nahi. Hinglish PAR Devanagari script mein, 3-4 lines.`,
+
+    recipe: `Tu ek ghar ka cook/recipe dost hai. Is image mein dikhne wale khane ko dekh:
+1. Yeh kaunsi dish hai (pehchano)?
+2. Ghar pe banane ke liye main ingredients kya chahiye (motā-motī list)?
+3. Banane ka chhota tareeka (steps, 3-4 line mein)?
+4. Ek desi tip (jaise "isme thoda kasuri methi daal de, swaad badh jayega").
+
+Agar yeh khana nahi hai (koi aur cheez hai) to bol do "yeh khane ki cheez nahi lagti, recipe ke liye khane ki photo bhejo".
+TONE: 70% practical + 30% witty. Hinglish PAR Devanagari script mein, 5-6 lines.`
 };
 
 // ============================================
@@ -248,6 +324,18 @@ imageInput.addEventListener('change', (e) => {
     if (file) handleImageFile(file);
 });
 
+// Camera input handler
+cameraInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) handleImageFile(file);
+});
+
+// Gallery / Camera buttons
+const galleryBtn = document.getElementById('galleryBtn');
+const cameraBtn = document.getElementById('cameraBtn');
+if (galleryBtn) galleryBtn.addEventListener('click', () => imageInput.click());
+if (cameraBtn) cameraBtn.addEventListener('click', () => cameraInput.click());
+
 function handleImageFile(file) {
     // Basic validation
     if (!file.type.startsWith('image/')) {
@@ -314,6 +402,7 @@ function compressImage(file) {
 function showPreviewAndButtons() {
     document.getElementById('dropZoneContent').classList.add('hidden');
     document.getElementById('trustPills').classList.add('hidden');
+    document.getElementById('uploadButtons').classList.add('hidden');
     imagePreview.src = originalPreviewDataUrl;
     imagePreview.classList.remove('hidden');
     actionButtons.classList.remove('hidden');
@@ -418,6 +507,13 @@ function displayResult(text) {
         cheap: "सस्ता या महँगा रिपोर्ट",
         quality: "कपड़े की क्वालिटी रिपोर्ट",
         utility: "काम की जानकारी",
+        factcheck: "फैक्ट चेक रिपोर्ट 📰",
+        food: "खाना चेक रिपोर्ट 🍽️",
+        weather: "मौसम अलर्ट 🌦️",
+        plant: "पौधा पहचान 🌱",
+        pet: "जानवर पहचान 🐾",
+        color: "रंग मैच रिपोर्ट 🎨",
+        recipe: "रेसिपी 👨‍🍳",
         device: "डिवाइस एनालिसिस",
         daynight: "दिन या रात एनालिसिस",
         ghost: "भूत या भ्रम रिपोर्ट 👻",
@@ -436,6 +532,9 @@ function displayResult(text) {
             coreIntelText.textContent += text.charAt(idx);
             idx++;
             setTimeout(typeWriter, typeSpeed);
+        } else {
+            // Type complete — ab links ko clickable bana do (safe: text pehle escape karo)
+            makeLinksClickable(text);
         }
     }
     typeWriter();
@@ -450,6 +549,23 @@ function displayResult(text) {
     } catch (e) {
         // Ad block ya AdSense load nahi hua - chup-chaap ignore
     }
+}
+
+// URLs ko clickable banao (XSS-safe: pehle escape, fir sirf URL ko anchor)
+function makeLinksClickable(rawText) {
+    // HTML escape (security)
+    const escaped = rawText
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+    // URLs ko <a> tag mein badlo
+    const urlRegex = /(https?:\/\/[^\s)]+)/g;
+    const linked = escaped.replace(urlRegex, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="result-link">${url}</a>`;
+    });
+
+    coreIntelText.innerHTML = linked;
 }
 
 // "Aur jaano" buttons banao — current action chhod ke baaki sab
@@ -495,16 +611,19 @@ function resetToActionScreen() {
 
 function resetToUploadScreen() {
     resultContainer.classList.add('hidden');
+    resultContainer.classList.remove('flex');
     actionButtons.classList.add('hidden');
     actionButtons.classList.remove('grid');
     imagePreview.classList.add('hidden');
     imagePreview.src = "";
     document.getElementById('dropZoneContent').classList.remove('hidden');
     document.getElementById('trustPills').classList.remove('hidden');
+    document.getElementById('uploadButtons').classList.remove('hidden');
     compressedImageBlob = null;
     originalPreviewDataUrl = null;
     currentAction = null;
     imageInput.value = "";
+    cameraInput.value = "";
     currentScreen = 'upload';
     updateBackButtonVisibility();
 }
