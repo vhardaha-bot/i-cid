@@ -4,7 +4,7 @@
 // ============================================
 
 // ---- CONFIG ----
-const API_URL = "https://i-cid-backend.vhoriginal.com/upload.php"; // Apna actual Hostinger PHP path yahan daal de
+const API_URL = "https://vhoriginal.com/icid/upload.php"; // Apna actual Hostinger PHP path yahan daal de
 const MAX_FILE_SIZE_MB = 5;
 const COMPRESS_MAX_WIDTH = 1024;
 const COMPRESS_QUALITY = 0.75;
