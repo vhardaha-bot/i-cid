@@ -1,67 +1,374 @@
-/* style.css */
+/* ============================================
+   i-CID — style.css
+   Detective / CID Animated Theme (CSS-only, mobile-smooth)
+   ============================================ */
+
 body {
-    background-color: #050505;
-    color: #00ff41; /* Classic Hacker Green */
-    font-family: 'Fira Code', monospace;
-    background-image: radial-gradient(circle, #001100 10%, #050505 80%);
     position: relative;
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* CRT Monitor Scanline Effect */
-body::after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 2;
-    background-size: 100% 2px, 3px 100%;
+html { scroll-behavior: smooth; }
+
+button { -webkit-tap-highlight-color: transparent; }
+
+#coreIntelText { -webkit-user-select: text; user-select: text; }
+
+header, #actionButtons, #loadingTerminal, footer {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* ============================================
+   ANIMATED BACKGROUND — moving grid + radar glow
+   ============================================ */
+.bg-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
     pointer-events: none;
+    overflow: hidden;
 }
 
-.terminal-border {
-    border: 1px solid #00ff41;
-    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+/* Moving cyber grid */
+.bg-fx::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background-image:
+        linear-gradient(rgba(79, 216, 232, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 216, 232, 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    animation: gridMove 18s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(44px, 44px); }
+}
+
+/* Radar sweep glow at top */
+.bg-fx::after {
+    content: "";
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    margin-left: -300px;
+    background: conic-gradient(from 0deg,
+        transparent 0deg,
+        rgba(46, 155, 240, 0.10) 40deg,
+        transparent 80deg);
+    border-radius: 50%;
+    animation: radarSweep 7s linear infinite;
+}
+
+@keyframes radarSweep {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Floating particles */
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    opacity: 0.4;
+    box-shadow: 0 0 6px var(--accent-cyan);
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0.5; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+main, header, footer { position: relative; z-index: 1; }
+
+/* ============================================
+   LOGO — pulse + shine
+   ============================================ */
+.logo-mark {
+    animation: logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(79,216,232,0.4)); }
+    50% { filter: drop-shadow(0 0 10px rgba(79,216,232,0.8)); }
+}
+
+.gradient-text {
+    background-size: 200% auto;
+    animation: textShine 4s linear infinite;
+}
+@keyframes textShine {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+/* ============================================
+   DROP ZONE — alive scanning frame
+   ============================================ */
+#dropZone {
     position: relative;
-    z-index: 10;
 }
 
-.glow-text {
-    text-shadow: 0 0 8px #00ff41;
+/* Animated corner brackets (CID frame look) */
+#dropZone .corner {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: var(--accent-cyan);
+    border-style: solid;
+    border-width: 0;
+    z-index: 15;
+    animation: cornerPulse 2.5s ease-in-out infinite;
+}
+#dropZone .corner.tl { top: 10px; left: 10px; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 6px; }
+#dropZone .corner.tr { top: 10px; right: 10px; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 6px; }
+#dropZone .corner.bl { bottom: 10px; left: 10px; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 6px; }
+#dropZone .corner.br { bottom: 10px; right: 10px; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 6px; }
+
+@keyframes cornerPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
 }
 
-/* Scanner Line Animation for Drop Zone */
-.scan-line {
+/* Idle continuous scan line inside drop zone */
+#dropZone .idle-scan {
+    position: absolute;
+    left: 0;
     width: 100%;
     height: 2px;
-    background-color: #00ff41;
-    position: absolute;
-    top: 0;
-    left: 0;
-    box-shadow: 0 0 15px 2px #00ff41;
-    animation: scan 2s infinite linear;
-    display: none;
-    z-index: 5;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    box-shadow: 0 0 14px 2px rgba(79, 216, 232, 0.6);
+    animation: idleScan 3s ease-in-out infinite;
+    z-index: 14;
+    pointer-events: none;
+}
+@keyframes idleScan {
+    0% { top: 12%; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { top: 88%; opacity: 0; }
 }
 
-@keyframes scan {
-    0% { top: 0%; opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
+#dropZone .upload-icon {
+    animation: iconBob 2.4s ease-in-out infinite;
+}
+@keyframes iconBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* ============================================
+   ACTION BUTTONS — staggered entry + hover lift
+   ============================================ */
+#actionButtons.grid .action-btn {
+    opacity: 0;
+    animation: btnSlideIn 0.45s ease forwards;
+}
+#actionButtons.grid .action-btn:nth-child(1) { animation-delay: 0.05s; }
+#actionButtons.grid .action-btn:nth-child(2) { animation-delay: 0.12s; }
+#actionButtons.grid .action-btn:nth-child(3) { animation-delay: 0.19s; }
+#actionButtons.grid .action-btn:nth-child(4) { animation-delay: 0.26s; }
+#actionButtons.grid .action-btn:nth-child(5) { animation-delay: 0.33s; }
+
+@keyframes btnSlideIn {
+    from { opacity: 0; transform: translateX(-14px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.action-btn {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(46, 155, 240, 0.18);
+}
+.action-btn:active {
+    transform: scale(0.97);
+}
+
+/* Sweep shine across button on hover */
+.action-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(79, 216, 232, 0.12), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+}
+.action-btn:hover::after {
+    left: 130%;
+}
+
+/* Icon badge subtle glow pulse */
+.action-btn .icon-badge {
+    transition: transform 0.2s ease;
+}
+.action-btn:hover .icon-badge {
+    transform: scale(1.08) rotate(-3deg);
+}
+
+/* ============================================
+   LOADING — forensic scanner
+   ============================================ */
+.scanner-box {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 10px;
+    background:
+        repeating-linear-gradient(0deg, rgba(79,216,232,0.04) 0px, rgba(79,216,232,0.04) 1px, transparent 1px, transparent 8px);
+}
+.scanner-box .sweep {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    box-shadow: 0 0 18px 3px rgba(79, 216, 232, 0.7);
+    animation: scannerSweep 1.4s ease-in-out infinite;
+}
+@keyframes scannerSweep {
+    0% { top: 0%; }
+    50% { top: 97%; }
+    100% { top: 0%; }
+}
+
+/* Glitch text effect for loading messages */
+.glitch {
+    position: relative;
+    animation: glitchShift 2.5s infinite;
+}
+@keyframes glitchShift {
+    0%, 92%, 100% { transform: translate(0); }
+    93% { transform: translate(-2px, 1px); }
+    94% { transform: translate(2px, -1px); }
+    95% { transform: translate(-1px, -1px); }
+    96% { transform: translate(1px, 1px); }
+}
+
+/* Spinning radar ring */
+.radar-ring {
+    position: relative;
+    width: 52px;
+    height: 52px;
+}
+.radar-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(79, 216, 232, 0.15);
+}
+.radar-ring::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(79,216,232,0.5) 70deg, transparent 90deg);
+    animation: spin 1.1s linear infinite;
+}
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   RESULT — reveal glow + thumb scan
+   ============================================ */
+#resultContainer.flex > * {
+    opacity: 0;
+    animation: resultReveal 0.5s ease forwards;
+}
+#resultContainer.flex > *:nth-child(1) { animation-delay: 0.05s; }
+#resultContainer.flex > *:nth-child(2) { animation-delay: 0.15s; }
+#resultContainer.flex > *:nth-child(3) { animation-delay: 0.25s; }
+#resultContainer.flex > *:nth-child(4) { animation-delay: 0.35s; }
+#resultContainer.flex > *:nth-child(5) { animation-delay: 0.45s; }
+
+@keyframes resultReveal {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Thumbnail scan-over effect when result shows */
+#resultThumb {
+    position: relative;
+}
+.thumb-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.thumb-wrap::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    box-shadow: 0 0 10px var(--accent-cyan);
+    animation: thumbScan 2s ease-in-out infinite;
+}
+@keyframes thumbScan {
+    0% { top: 0; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
     100% { top: 100%; opacity: 0; }
 }
 
-/* Typewriter Cursor */
-.cursor {
+/* Status header blinking dot */
+.live-dot {
     display: inline-block;
-    width: 8px;
-    height: 15px;
-    background-color: #00ff41;
-    animation: blink 1s step-end infinite;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+    animation: livePulse 1.3s ease-in-out infinite;
+    margin-right: 5px;
     vertical-align: middle;
 }
+@keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
 
-@keyframes blink { 
-    50% { opacity: 0; } 
+/* WhatsApp button gentle pulse to draw attention */
+#generateOGBtn {
+    animation: sharePulse 2.5s ease-in-out infinite;
+}
+@keyframes sharePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+    50% { box-shadow: 0 0 0 5px rgba(37, 211, 102, 0.12); }
+}
+
+/* Image preview rounded corner clip fix */
+#imagePreview { object-position: center; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 3px; }
+
+/* ============================================
+   ACCESSIBILITY — reduce motion respect
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
