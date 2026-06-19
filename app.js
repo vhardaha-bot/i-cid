@@ -140,6 +140,7 @@ TONE: 70% science + 30% mazedaar. Halka spooky-fun andaaz par end mein hamesha s
 3. Photo khud kitni purani lagti hai (recent click ya scan ki hui purani photo)?
 Confident na ho to "lagta hai", "ho sakta hai" use kar. Specific saal sirf tab bol jab pakka ho.
 TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 3-4 lines.`
+};
 
 // ============================================
 // SCREEN STATE MANAGEMENT (Back button + History)
@@ -444,7 +445,8 @@ function displayResult(text) {
 
     // AdSense ad load karo (result visible hone par)
     try {
-        (adsbygoogle = window.adsbygoogle || []).push({});
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
     } catch (e) {
         // Ad block ya AdSense load nahi hua - chup-chaap ignore
     }
