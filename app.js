@@ -4,7 +4,7 @@
 // ============================================
 
 // ---- CONFIG ----
-const API_URL = "https://vhoriginal.com/icid/upload.php"; // Apna actual Hostinger PHP path yahan daal de
+const API_URL = "https://vhoriginal.com/icid/upload.php"; // Hostinger PHP backend path
 const MAX_FILE_SIZE_MB = 5;
 const COMPRESS_MAX_WIDTH = 1024;
 const COMPRESS_QUALITY = 0.75;
@@ -40,6 +40,20 @@ const loadingMessages = [
     "[प्रोसेस] कच्चा चिट्ठा तैयार हो रहा है...",
     "[स्टेटस] फाइनल रिपोर्ट पे मोहर लग रही है..."
 ];
+
+// ---- BUTTON META — "aur jaano" section ke liye (label + chhota icon) ----
+const buttonMeta = {
+    fake:     { label: "असली या फेक?",    color: "#2ecc8f", icon: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M8 11l2 2 4-4"/>' },
+    brand:    { label: "ब्रांड एंड कीमत",  color: "#2e9bf0", icon: '<path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>' },
+    cheap:    { label: "सस्ता या महँगा?",  color: "#e8c44f", icon: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' },
+    quality:  { label: "कपड़े की क्वालिटी", color: "#c44ff0", icon: '<path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>' },
+    utility:  { label: "काम की बात",       color: "#f0a93e", icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
+    device:   { label: "कैमरा या मोबाइल?", color: "#4fd8e8", icon: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>' },
+    daynight: { label: "दिन या रात?",      color: "#f0843e", icon: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>' },
+    ghost:    { label: "भूत या भ्रम? 👻",  color: "#9aa6f0", icon: '<path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 3 3 2-3 2 3 3-3V10a8 8 0 0 0-8-8z"/>' },
+    age:      { label: "इमेज की उम्र",     color: "#a8845c", icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
+    deepscan: { label: "पूरा कच्चा चिट्ठा", color: "#4fd8e8", icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>' }
+};
 
 // ---- PROMPTS — Har feature ke liye serious/factual Gemini system prompts ----
 const prompts = {
@@ -82,12 +96,50 @@ TONE: 70% factual + 30% witty. Technical guess pehle, ek halki line se end (jais
     deepscan: `Tu ek complete forensic image analyst hai jo photo ka poora kachcha chittha kholta hai — detailed, factual, aur baat karne ka andaaz mazedaar. Is image ka poora breakdown ek paragraph mein de:
 - Image mein kya/kaun dikh raha hai (objects, log, setting)
 - Background aur context kya bata raha hai
+- Agar koi purani imaarat/monument/historical jagah dikhe to uske baare mein bata: kaunse daur ki lag rahi hai, architecture style kya hai (Mughal/Rajput/colonial/modern), andaazan kitni purani ho sakti hai. PAR koi specific raja ka naam ya exact saal confident hoke mat bol jab tak 100% sure na ho — "lagta hai", "ho sakta hai" use kar.
 - Kya image edited/filtered/AI-generated lagti hai
 - Agar koi text/document/number plate dikh raha hai, uska content
-- Overall image quality aur kya yeh confident analysis ke liye sufficient hai
+- Overall image quality
 
-TONE: 70% factual forensic report + 30% witty narration. Sab kuch ek continuous paragraph mein, Hinglish mein PAR Devanagari script (Hindi alphabet) mein, jaise ek smart detective apni report sunaa raha ho jisme beech-beech mein halki mazedaar tippani ho. Mazaak photo/scene/edit pe, kisi insaan ka apmaan kabhi nahi. Agar minor dikhe toh mazaak hata do. 6-8 lines.`
-};
+IMPORTANT — LOCATION RULE: Photo ki EXACT location (shehar, gaon, area, address) KABHI mat batao, chahe clues kitne bhi clear hon. Iske bajaye ant mein ek witty note daalo jaise: "Aur haan — privacy ke kaaran exact location nahi bataunga bhai, warna main chane bechने chala jaunga! 😏" (yeh line ya iski tarah koi mazedaar line). Sirf architecture/region ka general type bata sakte ho (jaise "North Indian style"), par specific jagah nahi.
+
+TONE: 70% factual forensic report + 30% witty narration. Sab kuch ek continuous paragraph mein, Hinglish mein PAR Devanagari script (Hindi alphabet) mein, jaise ek smart detective apni report sunaa raha ho. Mazaak photo/scene/edit pe, kisi insaan ka apmaan kabhi nahi. Agar minor dikhe toh mazaak hata do. 6-8 lines.`,
+
+    cheap: `Tu ek shopping/value expert hai jo cheezon ki keemat ka andaaza lagata hai — factual par chatpata. Is image mein dikhne wali cheez (kapde, accessory, gadget, furniture, jo bhi) ko dekh kar bata:
+1. Yeh cheez sasti category ki lagti hai ya mehngi/premium? Kyun (material, finish, brand cues se)?
+2. Andaazan keemat range Indian Rupees mein (jaise "₹500-1000" ya "₹5000+")?
+3. Value for money lagti hai ya nahi?
+Agar image blurry hai ya cheez clear nahi, bol do "clear photo bhejo behtar andaaze ke liye".
+TONE: 70% factual + 30% witty. Mazaak cheez/product pe, kisi insaan ki aukat pe NAHI. Hinglish PAR Devanagari script mein, 3-4 lines.`,
+
+    quality: `Tu ek textile/fabric quality expert hai. Is image mein dikhne wale kapde ko dekh kar factually bata:
+1. Fabric kaunsa lagta hai (cotton, polyester, silk, denim, mix)?
+2. Quality kaisी lagti hai (stitching, texture, finish se) — accha, average, ya cheap?
+3. Pehnne ke liye kis mausam/occasion ke liye theek rahega?
+Agar clear na dikhe to bol do clear photo bhejo.
+TONE: 70% factual + 30% witty. Mazaak fabric/quality pe, insaan pe nahi. Hinglish PAR Devanagari script mein, 3-4 lines.`,
+
+    daynight: `Tu ek photo analyst hai jo light/timing ka andaaza lagata hai. Is image ko dekh kar bata:
+1. Yeh din mein li gayi lagti hai ya raat mein? Kis cheez se pata chala (sunlight, shadow direction, artificial light, sky)?
+2. Andaazan time of day (subah, dopahar, shaam, raat)?
+3. Indoor hai ya outdoor?
+Agar pata na chale to honestly bol do.
+TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 3-4 lines.`,
+
+    ghost: `Tu ek science-first photo analyst hai jo "bhootiya" lagne wali cheezon ko SCIENCE se samjhata hai. Is image ko dekh:
+1. Kya isme koi aisी cheez hai jo log "bhoot/aatma" samajh sakte hain (dhundhli aakriti, reflection, shadow, chehra-jaisा pattern)?
+2. Har aisी cheez ko SCIENCE se explain kar — yeh actually kya hai: camera reflection, lens flare, motion blur, double exposure, pareidolia (dimaag ka random patterns mein chehre dhoondhna), shadow, ya dust particle.
+3. CLEAR conclusion: koi asli bhoot/aatma NAHI hai, yeh [scientific reason] hai.
+
+BAHUT ZAROORI: Kabhi bhi yeh mat bolo ki photo mein sach mein bhoot/aatma/paranormal cheez hai. Hamesha science-based explanation do. Agar kuch bhi aisा nahi hai, to bol do "is photo mein koi bhootiya cheez nahi, ekdum normal hai — darne ki zaroorat nahi! 👻"
+TONE: 70% science + 30% mazedaar. Halka spooky-fun andaaz par end mein hamesha science aur reassurance. Hinglish PAR Devanagari script mein, 4-5 lines.`,
+
+    age: `Tu ek photo-dating expert hai jo andaaza lagata hai ki photo/cheez kitni purani hai. Is image ko dekh kar bata:
+1. Yeh photo kab ki lag rahi hai (naye zamane ki, ya purani)? Kis cheez se pata chala (photo quality, colors, fashion, technology, vehicles, architecture)?
+2. Agar koi purani imaarat/cheez hai to woh kitni purani ho sakti hai (andaazan daur/era)?
+3. Photo khud kitni purani lagti hai (recent click ya scan ki hui purani photo)?
+Confident na ho to "lagta hai", "ho sakta hai" use kar. Specific saal sirf tab bol jab pakka ho.
+TONE: 70% factual + 30% witty. Hinglish PAR Devanagari script mein, 3-4 lines.`
 
 // ============================================
 // SCREEN STATE MANAGEMENT (Back button + History)
@@ -290,6 +342,7 @@ async function startScanProcess() {
     actionButtons.classList.add('hidden');
     actionButtons.classList.remove('grid');
     resultContainer.classList.add('hidden');
+    resultContainer.classList.remove('flex');
     loadingTerminal.classList.remove('hidden');
     loadingTerminal.classList.add('flex');
     scanLine.style.display = 'block';
@@ -361,8 +414,13 @@ function displayResult(text) {
     const statusLabels = {
         fake: "असली या फेक रिपोर्ट",
         brand: "ब्रांड एंड कीमत रिपोर्ट",
+        cheap: "सस्ता या महँगा रिपोर्ट",
+        quality: "कपड़े की क्वालिटी रिपोर्ट",
         utility: "काम की जानकारी",
         device: "डिवाइस एनालिसिस",
+        daynight: "दिन या रात एनालिसिस",
+        ghost: "भूत या भ्रम रिपोर्ट 👻",
+        age: "इमेज की उम्र रिपोर्ट",
         deepscan: "पूरा कच्चा चिट्ठा"
     };
     statusHeader.textContent = statusLabels[currentAction] || "रिपोर्ट तैयार";
@@ -381,7 +439,41 @@ function displayResult(text) {
     }
     typeWriter();
 
+    renderMoreButtons();
     setScreen('result');
+
+    // AdSense ad load karo (result visible hone par)
+    try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+        // Ad block ya AdSense load nahi hua - chup-chaap ignore
+    }
+}
+
+// "Aur jaano" buttons banao — current action chhod ke baaki sab
+function renderMoreButtons() {
+    const moreButtons = document.getElementById('moreButtons');
+    moreButtons.innerHTML = "";
+
+    Object.keys(buttonMeta).forEach((action) => {
+        if (action === currentAction) return; // jo abhi dekha woh skip
+
+        const meta = buttonMeta[action];
+        const btn = document.createElement('button');
+        btn.className = "panel-interactive more-btn";
+        btn.setAttribute('data-action', action);
+        btn.innerHTML = `
+            <span class="more-btn-icon" style="color:${meta.color}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${meta.icon}</svg>
+            </span>
+            <span class="more-btn-label">${meta.label}</span>
+        `;
+        btn.addEventListener('click', () => {
+            currentAction = action;
+            startScanProcess(); // same image, naya analysis
+        });
+        moreButtons.appendChild(btn);
+    });
 }
 
 // ============================================
