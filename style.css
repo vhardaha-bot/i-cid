@@ -359,6 +359,52 @@ main, header, footer { position: relative; z-index: 1; }
 /* Image preview rounded corner clip fix */
 #imagePreview { object-position: center; }
 
+/* Powered by Ai Vista badge */
+.powered-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--border-subtle);
+    padding: 3px 10px;
+    border-radius: 20px;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+.powered-badge:hover {
+    border-color: var(--border-active);
+    color: var(--text-mid);
+}
+.powered-name {
+    color: var(--accent-cyan);
+    font-weight: 700;
+    background: linear-gradient(90deg, #2e9bf0, #4fd8e8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.powered-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+    animation: livePulse 1.5s ease-in-out infinite;
+}
+
+/* Clickable links in result (fact-check sources) */
+.result-link {
+    color: var(--accent-cyan);
+    text-decoration: underline;
+    word-break: break-all;
+    font-weight: 600;
+}
+.result-link:active {
+    opacity: 0.7;
+}
+
 /* ============================================
    AUR JAANO — compact buttons in result screen
    ============================================ */
